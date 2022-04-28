@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/mipimentel/gin-api-rest/controllers"
+	"github.com/mipimentel/gin-api-rest/database"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,4 +33,18 @@ func TestVerificaStatusCode(t *testing.T) {
 	respostaBody, _ := ioutil.ReadAll(resposta.Body)
 
 	assert.Equal(t, mockDaResposta, string(respostaBody))
+}
+
+func TestListaTodosOsAlunosHandler(t *testing.T) {
+	database.ConectaComBancoDeDados()
+
+	r := SetupRotasDeTeste()
+	r.GET("/alunos", controllers.ExibeTodosAlunos)
+
+	req, _ := http.NewRequest("GET", "/alunos", nil)
+	resposta := httptest.NewRecorder()
+
+	r.ServeHTTP(resposta, req)
+
+	assert.Equal(t, http.StatusOK, resposta.Code)
 }
