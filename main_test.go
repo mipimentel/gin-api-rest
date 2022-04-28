@@ -17,6 +17,7 @@ import (
 var ID int
 
 func SetupRotasDeTeste() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	rotas := gin.Default()
 	return rotas
 }
@@ -63,6 +64,24 @@ func TestListaTodosOsAlunosHandler(t *testing.T) {
 	resposta := httptest.NewRecorder()
 
 	r.ServeHTTP(resposta, req)
+
+	assert.Equal(t, http.StatusOK, resposta.Code)
+}
+
+func TestBuscaAlunoPorCPF(t *testing.T) {
+	database.ConectaComBancoDeDados()
+
+	CriaAlunoMock()
+	defer DeletaAlunoMock()
+
+	r := SetupRotasDeTeste()
+	r.GET("alunos/cpf/:cpf", controllers.BuscaAlunoPorCPF)
+
+	req, _ := http.NewRequest("GET", "/alunos/cpf/12345678910", nil)
+	resposta := httptest.NewRecorder()
+
+	r.ServeHTTP(resposta, req)
+	assert.Equal(t, http.StatusOK, resposta.Code)
 
 	assert.Equal(t, http.StatusOK, resposta.Code)
 }
