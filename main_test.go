@@ -97,9 +97,9 @@ func TestBuscaAlunoPorIDHandler(t *testing.T) {
 	r := SetupRotasDeTeste()
 	r.GET("/alunos/:id", controllers.BuscaAlunoPorId)
 
-	path_alunos_id := "/alunos/" + strconv.Itoa(ID)
+	pathDeBusca := "/alunos/" + strconv.Itoa(ID)
 
-	req, _ := http.NewRequest("GET", path_alunos_id, nil)
+	req, _ := http.NewRequest("GET", pathDeBusca, nil)
 	resposta := httptest.NewRecorder()
 
 	r.ServeHTTP(resposta, req)
