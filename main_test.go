@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -128,4 +129,30 @@ func TestDeletaAlunoHandler(t *testing.T) {
 
 	r.ServeHTTP(resposta, req)
 	assert.Equal(t, http.StatusOK, resposta.Code)
+}
+
+func TestEditaAlunoHandler(t *testing.T) {
+	database.ConectaComBancoDeDados()
+
+	CriaAlunoMock()
+	defer DeletaAlunoMock()
+
+	r := SetupRotasDeTeste()
+	r.PATCH("/alunos/:id", controllers.EditaAluno)
+
+	pathDeEditar := "/alunos/" + strconv.Itoa(ID)
+
+	aluno := models.Aluno{Nome: "Nome do Aluno Teste", CPF: "47123456789", RG: "123456700"}
+
+	valorJson, _ := json.Marshal(aluno)
+
+	req, _ := http.NewRequest("PATCH", pathDeEditar, bytes.NewBuffer(valorJson))
+	resposta := httptest.NewRecorder()
+
+	r.ServeHTTP(resposta, req)
+
+	var alunoMockAtualizado models.Aluno
+	json.Unmarshal(resposta.Body.Bytes(), &alunoMockAtualizado)
+
+	assert.Equal(t, "47123456789", alunoMockAtualizado.CPF)
 }
