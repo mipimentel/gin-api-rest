@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -84,4 +86,29 @@ func TestBuscaAlunoPorCPF(t *testing.T) {
 	assert.Equal(t, http.StatusOK, resposta.Code)
 
 	assert.Equal(t, http.StatusOK, resposta.Code)
+}
+
+func TestBuscaAlunoPorIDHandler(t *testing.T) {
+	database.ConectaComBancoDeDados()
+
+	CriaAlunoMock()
+	defer DeletaAlunoMock()
+
+	r := SetupRotasDeTeste()
+	r.GET("/alunos/:id", controllers.BuscaAlunoPorId)
+
+	path_alunos_id := "/alunos/" + strconv.Itoa(ID)
+
+	req, _ := http.NewRequest("GET", path_alunos_id, nil)
+	resposta := httptest.NewRecorder()
+
+	r.ServeHTTP(resposta, req)
+
+	var alunoMock models.Aluno
+
+	json.Unmarshal(resposta.Body.Bytes(), &alunoMock)
+
+	assert.Equal(t, http.StatusOK, resposta.Code)
+	assert.Equal(t, "Nome do Aluno Teste", alunoMock.Nome, "Os nomes devem ser iguais")
+	assert.Equal(t, "12345678910", alunoMock.CPF, "Os CPF's devem ser iguais")
 }
