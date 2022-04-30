@@ -1,11 +1,26 @@
 name: go-github-actions
 on: [push]
 jobs:
-  check-bats-version:
+  go-test:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_DB: "alunos"
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           go-version: ">=1.17.0"
       - run: go test
+      env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_DB: "alunos"
